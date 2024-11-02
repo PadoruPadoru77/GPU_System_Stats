@@ -6,8 +6,8 @@ import soundcard as sc
 from pyqtgraph.Qt import QtWidgets, QtCore
 from pynvml import nvmlInit, nvmlDeviceGetHandleByIndex, nvmlDeviceGetUtilizationRates, nvmlDeviceGetTemperature, NVML_TEMPERATURE_GPU
 
-nvmlInit()
-gpu_handle = nvmlDeviceGetHandleByIndex(0)
+nvmlInit() #Initialize nvidia device stats
+gpu_handle = nvmlDeviceGetHandleByIndex(0) #Assuming only 1 gpu
 
 app = QtWidgets.QApplication([])
 
@@ -23,9 +23,6 @@ win.nextRow()
 p3 = win.addPlot(title="CPU Clock Speed (MHz)")
 p4 = win.addPlot(title="CPU Usage (%)")
 win.nextRow()
-
-# Maximum number of points to display
-max_points = 100
 
 # Set labels for y-axes of main plots for consistent alignment
 p1.setLabel('left', 'GPU Usage (%)')
@@ -90,7 +87,7 @@ default_speaker = sc.default_speaker()
 def get_audio_peak():
     """Capture audio from the default speaker and compute its volume peak."""
     try:
-        with sc.get_microphone(id=str(default_speaker.name), include_loopback=True).recorder(samplerate=44100, blocksize=4096) as mic:
+        with sc.get_microphone(id=str(default_speaker.name), include_loopback=True).recorder(samplerate=44100, blocksize=4096) as mic: #Getting microphone as input, but enable loopback to hear system output
             audio_data = mic.record(numframes=1024)
             # Take the absolute value to remove negative peaks
             peak_volume = np.max(np.abs(audio_data))  # Detect absolute peak volume
@@ -98,6 +95,9 @@ def get_audio_peak():
     except Exception as e:
         print("Error capturing audio:", e)
         return 0
+
+# Maximum number of points to display
+max_points = 100
 
 # Set y-axis range and limits for each plot, and disable y-axis zoom/pan
 p1.setYRange(0, 100)  # GPU Usage (%)
